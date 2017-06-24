@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
     // fclose(fp);
     // puts(res);
     char *res;
-    fgets(buff, MAX_SIZE, (FILE*)fp);
+    fgets(res, MAX_SIZE, (FILE*)fp);
     cf_parse(res);
     free(res);
     fclose(fp);
