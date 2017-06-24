@@ -8,15 +8,17 @@
 
 #include "util.h"
 
+#define MAX_SIZE 0xFFFFF
+
 typedef struct cf_Program cf_Program;
 
 struct cf_Program {
-	char *instructions;
+	char *inst;
 };
 
 // stati c char *concat(const char *str, ...);
 
 
-cf_Program *cf_parse(char *stream);
+cf_Program *cf_parse(char *source);
 
 #endif
