@@ -1,34 +1,16 @@
 #include "conf.h"
 
-static char *concat(const char *str, ...) {
-  va_list args;
-  const char *s;
-  /* Get len */
-  int len = strlen(str);
-  va_start(args, str);
-  while ((s = va_arg(args, char*))) {
-    len += strlen(s);
+static char *dirname(char *str) {
+  char *p = str + strlen(str);
+  while (p != str) {
+    if (*p == '/' || *p == '\\') {
+      *p = '\0';
+      break;
+    }
+    p--;
   }
-  va_end(args);
-  /* Build string */
-  char *res = malloc(len + 1);
-  if (!res) return NULL;
-  strcpy(res, str);
-  va_start(args, str);
-  while ((s = va_arg(args, char*))) {
-    strcat(res, s);
-  }
-  va_end(args);
-  return res;
+  return str;
 }
-
-char* stradd(const char* a, char b){
-    size_t len = strlen(a) + strlen(&b);
-    char *ret = (char*)malloc(len * sizeof(char) + 1);
-    *ret = '\0';
-    return strcat(strcat(ret, a), &b);
-}
-
 
 cf_Program *cf_parse(char *source) {
 	cf_Program *p = calloc(1, sizeof(cf_Program));
@@ -54,30 +36,14 @@ cf_Program *cf_parse(char *source) {
 }
 
 int main(int argc, char **argv) {
-  if (argc > 1) {    
-    // puts(argv[1]);
-    FILE *fp = fopen(argv[1], "rb");
-    // /* Get file size */
-    // fseek(fp, 0, SEEK_END);
-    // size_t len = ftell(fp);
-    // /* Load file */
-    // fseek(fp, 0, SEEK_SET);
-    // char *res = malloc(len + 1);
-    // exit(1);
-    // res[len] = '\0';
-    // if (fread(res, 1, len, fp) != len) {
-    //   puts("error");
-    //   free(res);
-    //   fclose(fp);
-    //   exit(1);
-    // }
-    // fclose(fp);
-    // puts(res);
-    char *res;
-    fgets(res, MAX_SIZE, (FILE*)fp);
-    cf_parse(res);
-    free(res);
-    fclose(fp);
+  if (argc > 1) {
+
+    char buf[1024];
+    size_t size = sizeof(buf);
+    ASSERT( getcwd(buf, size) != NULL );
+    dirname(buf);    
+    puts(buf);
+
   } else {
     char buf[MAX_SIZE];
     gets(buf);

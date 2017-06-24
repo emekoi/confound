@@ -7,6 +7,7 @@ INCLUDE = [ ]
 SOURCE = [
   "src/*.c",
   "src/vec/*.c",
+  "src/fs/*.c",
 ]
 FLAGS = [ "-Wall", "-Wextra", "--std=gnu99", "-fno-strict-aliasing" ]
 LINK = [ "m" ]
