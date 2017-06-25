@@ -9,6 +9,14 @@
 #ifndef FS_H
 #define FS_H
 
+#define fs_error(err) do { \
+  if (err != FS_ESUCCESS) { \
+    fprintf(stderr, "%s[ERROR %s]:%s %s:%d: %s(): %s\n", color_red, __TIME__, \
+    color_reset, __FILE__, __LINE__, __func__, fs_errorStr(err)); \
+    exit(EXIT_FAILURE); \
+  } \
+} while(0);
+
 typedef struct fs_FileListNode {
   char *name;
   struct fs_FileListNode *next;

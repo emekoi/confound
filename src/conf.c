@@ -23,7 +23,6 @@ cf_Program *cf_parse(char *source) {
 			case '+':case '-':
 			case '.':case ',':
 			case '[':case ']': {
-				// printf("%c\n", *i);
 				p->inst[k++] = *i;
 				break;
 			} default:
@@ -31,19 +30,42 @@ cf_Program *cf_parse(char *source) {
 		}
 		i++;
 	}
+  p->inst[k+1] = '\0';
 	printf("%s\n", p->inst);
 	return p;
 }
 
 int main(int argc, char **argv) {
   if (argc > 1) {
+    char *path = dirname(argv[1]);
+    puts(path);
+    fs_error(fs_setWritePath(path));
+    fs_error(fs_mount(path));
 
-    char buf[1024];
-    size_t size = sizeof(buf);
-    ASSERT( getcwd(buf, size) != NULL );
-    dirname(buf);    
-    puts(buf);
+    fs_FileListNode *list = fs_listDir(path);
+    if (list) {
+      // puts("hjk");
+      int i = 1;
+      fs_FileListNode *n = list;
+      while (n) {
+        // puts(n->name);
+        i++;
+        n = n->next;
+      }
+    } else {
+      puts("uh oh");
+    }
 
+    // puts(basename(argv[1]));
+    if (fs_exists(argv[1])) {
+      puts(basename(argv[1]));
+      size_t len;
+      char *data = fs_read(basename(argv[1]), &len);
+      puts(data);
+    } 
+    fs_freeFileList(list);
+    fs_unmount(path);
+    fs_deinit();
   } else {
     char buf[MAX_SIZE];
     gets(buf);

@@ -10,7 +10,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <libgen.h>
 #include <assert.h>
 #include <stdarg.h>
 #include <unistd.h>
@@ -21,9 +20,7 @@
 #define ftello ftell
 #define fseeko64 fseek
 #define ftello64 ftell
-
-#include "miniz.c"
-
+#include "lib/miniz.c"
 #include "fs.h"
 
 #if _WIN32
@@ -521,4 +518,3 @@ int fs_makeDirs(const char *path) {
   free(name);
   return res;
 }
-
