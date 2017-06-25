@@ -70,9 +70,17 @@ static char *concat(const char *str, ...) {
   return res;
 }
 
-cf_Program *cf_parse(char *source) {
-	cf_Program *p = calloc(1, sizeof(cf_Program));
-	p->inst = calloc(strlen(source), sizeof(char));
+cf_Program *cf_new_program(size_t len) {
+  cf_Program *p = calloc(1, sizeof(cf_Program));
+  p->inst = calloc(len, sizeof(char));
+  p->mem = calloc(MAX_SIZE, sizeof(int));
+  p->pc = 0;
+  return p;
+}
+
+cf_Program *cf_parse_program(char *source) {
+	cf_Program *p = cf_new_program(strlen(source));
+
 	char *i = source;
   int k = 0;
 	while (*i) {
@@ -92,9 +100,15 @@ cf_Program *cf_parse(char *source) {
 	return p;
 }
 
+void cf_run_program(cf_Program *program) {
+  UNUSED(program);
+}
+
 int main(int argc, char **argv) {
   clock_t start, end, cpu;
   start = clock();
+  cf_Program *program;
+
   if (argc > 1) {
     char *path = dirname(concat("./", strip(argv[1]), NULL));
     char *file = basename(concat("./", strip(argv[1]), NULL));
@@ -109,7 +123,8 @@ int main(int argc, char **argv) {
       size_t len;
       char *data = fs_read(file, &len);
       /* parse file*/
-      cf_parse(data);
+      program = cf_parse_program(data);
+      cf_run_program(program);
       // printf("data : %s\n", data);
     } 
     fs_unmount(path);
@@ -119,7 +134,8 @@ int main(int argc, char **argv) {
     char buf[MAX_SIZE];
     gets(buf);
     /* parse input*/
-    cf_parse(buf);
+    program = cf_parse_program(buf);
+    cf_run_program(program);
   }
 
   end = clock();
