@@ -14,8 +14,15 @@
     fprintf(stderr, "%s[ASSERTION FAILED]:%s %s:%d: %s(): %s; ", color_red, color_reset, __FILE__, __LINE__, __func__, #cond); \
   fprintf(stderr, __VA_ARGS__); \
   fprintf(stderr, "\n"); \
-  abort(); \
+  exit(EXIT_FAILURE); \
   } \
+} while(0);
+
+#define CF_ERROR(program, position, ...) do { \
+  fprintf(stderr, "%s[ERROR]:%s %s:%lu: ", color_red, color_reset, program->name, position); \
+  fprintf(stderr, __VA_ARGS__); \
+  fprintf(stderr, "\n"); \
+  exit(EXIT_FAILURE); \
 } while(0);
 
 #define UNUSED(x)       ((void) (x))

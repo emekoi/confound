@@ -29,23 +29,18 @@ static char *basename(char *str) {
 }
 
 char *strip(char *s) {
-    size_t size;
-    char *end;
-
-    size = strlen(s);
-
-    if (!size)
-        return s;
-
-    end = s + size - 1;
-    while (end >= s && isspace(*end))
-        end--;
-    *(end + 1) = '\0';
-
-    while (*s && isspace(*s))
-        s++;
-
+  size_t size;
+  char *end;
+  size = strlen(s);
+  if (!size)
     return s;
+  end = s + size - 1;
+  while (end >= s && isspace(*end))
+    end--;
+  *(end + 1) = '\0';
+  while (*s && isspace(*s))
+    s++;
+  return s;
 }
 
 static char *concat(const char *str, ...) {
@@ -70,17 +65,24 @@ static char *concat(const char *str, ...) {
   return res;
 }
 
-cf_Program *cf_new_program(size_t len) {
+cf_Program *cf_new_program(char *name, size_t len) {
   cf_Program *p = calloc(1, sizeof(cf_Program));
   p->inst = calloc(len, sizeof(char));
-  p->mem = calloc(MAX_SIZE, sizeof(int));
-  p->pc = 0;
+  p->mem = calloc(MAX_SIZE, sizeof(char));
+  p->name = name;
+  p->len = len;
+  p->dp = 0;
   return p;
 }
 
-cf_Program *cf_parse_program(char *source) {
-	cf_Program *p = cf_new_program(strlen(source));
+void cf_close_program(cf_Program *program) {
+  free(program->inst);
+  free(program->mem);
+  free(program);
+}
 
+cf_Program *cf_parse_program(char *name, char *source) {
+	cf_Program *p = cf_new_program(name, strlen(source));
 	char *i = source;
   int k = 0;
 	while (*i) {
@@ -100,8 +102,78 @@ cf_Program *cf_parse_program(char *source) {
 	return p;
 }
 
+size_t *cf_compute_jumptable(cf_Program *program) {
+  size_t *jmp_table = calloc(1, sizeof(size_t));
+  return jmp_table;
+}
+
 void cf_run_program(cf_Program *program) {
-  UNUSED(program);
+  cf_Program *p = program;
+  for (p->ic = 0; p->ic <= p->len; p->ic++) {
+    switch (*(p->inst + p->ic)) {
+      case '>': {
+        p->dp++;
+        break;
+      } case '<': {
+        p->dp--;
+        break;
+      } case '+': {
+        p->mem[p->dp]++;
+        break;
+      } case '-': {
+        p->mem[p->dp]--;
+        break;
+      } case '.': {
+        putchar(p->mem[p->dp]);
+        break;
+      } case ',': {
+        p->mem[p->dp] = getchar();
+        break;
+      } case '[': {
+        if (p->mem[p->dp] == 0) {
+          int bracket_nesting = 1;
+          size_t old_ic = p->ic;
+          while (bracket_nesting && ++p->ic < p->len) {
+            if (*(p->inst + p->ic) == ']') {
+              bracket_nesting--;
+            } else if (*(p->inst + p->ic) == '[') {
+              bracket_nesting++;
+            }
+          }
+
+          if (!bracket_nesting) {
+            break;
+          } else {
+            CF_ERROR(program, old_ic, "unmatched '['");
+          }
+        }
+        break;
+      } case ']': {
+        if (p->mem[p->dp] != 0) {
+          int bracket_nesting = 1;
+          size_t old_ic = p->ic;
+
+          while (bracket_nesting && p->ic > 0) {
+            p->ic--;
+            if (*(p->inst + p->ic) == '[') {
+              bracket_nesting--;
+            } else if (*(p->inst + p->ic) == ']') {
+              bracket_nesting++;
+            }
+          }
+
+          if (!bracket_nesting) {
+            break;
+          } else {
+            CF_ERROR(program, old_ic, "unmatched ']'");
+          }
+        }
+        break;
+      } default: {
+        break;
+      }
+    }
+  }
 }
 
 int main(int argc, char **argv) {
@@ -113,7 +185,7 @@ int main(int argc, char **argv) {
     char *path = dirname(concat("./", strip(argv[1]), NULL));
     char *file = basename(concat("./", strip(argv[1]), NULL));
     printf("\npath : %s\n", path);
-    printf("file : %s\n", file);
+    printf("file : %s\n\n", file);
 
     fs_error(fs_mount(path));
     fs_error(fs_setWritePath(path));
@@ -122,10 +194,10 @@ int main(int argc, char **argv) {
       /* read the file */
       size_t len;
       char *data = fs_read(file, &len);
-      /* parse file*/
-      program = cf_parse_program(data);
+      /* parse file */
+      program = cf_parse_program(file, data);
       cf_run_program(program);
-      // printf("data : %s\n", data);
+      cf_close_program(program);
     } 
     fs_unmount(path);
     fs_deinit();
@@ -133,14 +205,15 @@ int main(int argc, char **argv) {
     /* get input from console */
     char buf[MAX_SIZE];
     gets(buf);
-    /* parse input*/
-    program = cf_parse_program(buf);
+    /* parse input */
+    program = cf_parse_program("stdin", buf);
     cf_run_program(program);
+    cf_close_program(program);
   }
 
+
   end = clock();
-  
   cpu = (end - start) / CLOCKS_PER_SEC;
-  printf("%ld milliseconds elapsed\n", cpu);
+  printf("\n\n%ld seconds elapsed\n", cpu);
   return 0;
 }

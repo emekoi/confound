@@ -9,7 +9,7 @@ SOURCE = [
   "src/lib/vec/*.c",
   "src/lib/fs/*.c",
 ]
-FLAGS = [ "-Wall", "-Wextra", "--std=gnu99", "-fno-strict-aliasing" ]
+FLAGS = [ "-Wall", "-Wextra","--std=c99" ]
 LINK = [ "m" ]
 DEFINE = [ ]
 EXTRA = ""
@@ -24,10 +24,8 @@ if platform.system() == "Linux":
 
 if platform.system() == "Darwin":
   LINK += [ ]
-  FLAGS += [  ]
-  # EXTRA += 
+  FLAGS += [ ]
   DEFINE += [ ]
-  # DEFINE += [ "SR_MODE_ARGB" ]
 
 
 def fmt(fmt, dic):
@@ -86,7 +84,7 @@ def main():
   print "compiling..."
   res = os.system(cmd)
 
-  if build == "release":
+  if build == "release" and os.path.isfile("bin/conf"):
     print "stripping..."
     os.system("strip %s" % OUTPUT)
 

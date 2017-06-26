@@ -10,19 +10,26 @@
 
 #include "util.h"
 #include "lib/fs/fs.h"
+#include "lib/vec/vec.h"
 
 #define MAX_SIZE 0xFFFFF
 
+typedef vec_t(size_t) vec_uint_t;
 typedef struct cf_Program cf_Program;
 
 struct cf_Program {
 	char *inst;
-	size_t pc;
-	int *mem;
+	char *name;
+	char *mem;
+	size_t len;
+	size_t ic;
+	size_t dp;
 };
 
-cf_Program *cf_new_program(size_t len);
-cf_Program *cf_parse_program(char *source);
+cf_Program *cf_new_program(char *name, size_t len);
+void cf_close_program(cf_Program *program);
+cf_Program *cf_parse_program(char *name, char *source);
+size_t *cf_compute_jumptable(cf_Program *program);
 void cf_run_program(cf_Program *program);
 
 #endif

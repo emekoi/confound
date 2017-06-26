@@ -1,11 +1,7 @@
-[
-   Takes an integer from stdin and emits its factors to stdout
-
-   Factor an arbitrarily large positive integer
-
-   Copyright (C) 1999 by Brian Raiter
-   under the GNU General Public License
-]
+* factor an arbitrarily large positive integer
+*
+* Copyright (C) 1999 by Brian Raiter
+* under the GNU General Public License
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>-
 
