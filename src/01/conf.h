@@ -10,11 +10,9 @@
 
 #include "util.h"
 #include "lib/fs/fs.h"
-#include "lib/vec/vec.h"
 
 #define MAX_SIZE 0xFFFFF
 
-typedef vec_t(size_t) vec_uint_t;
 typedef struct cf_Program cf_Program;
 
 struct cf_Program {

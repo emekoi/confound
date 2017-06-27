@@ -82,29 +82,24 @@ void cf_close_program(cf_Program *program) {
 }
 
 cf_Program *cf_parse_program(char *name, char *source) {
-	cf_Program *p = cf_new_program(name, strlen(source));
-	char *i = source;
+  cf_Program *p = cf_new_program(name, strlen(source));
+  char *i = source;
   int k = 0;
-	while (*i) {
-		switch (*i) {
-			case '>':case '<':
-			case '+':case '-':
-			case '.':case ',':
-			case '[':case ']': {
-				p->inst[k++] = *i;
-				break;
-			} default:
-				break;
-		}
-		i++;
-	}
+  while (*i) {
+    switch (*i) {
+      case '>':case '<':
+      case '+':case '-':
+      case '.':case ',':
+      case '[':case ']': {
+        p->inst[k++] = *i;
+        break;
+      } default:
+        break;
+    }
+    i++;
+  }
   p->inst[k+1] = '\0';
-	return p;
-}
-
-size_t *cf_compute_jumptable(cf_Program *program) {
-  size_t *jmp_table = calloc(1, sizeof(size_t));
-  return jmp_table;
+  return p;
 }
 
 void cf_run_program(cf_Program *program) {
@@ -184,7 +179,8 @@ int main(int argc, char **argv) {
   if (argc > 1) {
     char *path = dirname(concat("./", strip(argv[1]), NULL));
     char *file = basename(concat("./", strip(argv[1]), NULL));
-    printf("\npath : %s\n", path);
+    printf("\nexe : %s\n", argv[0]);
+    printf("path : %s\n", path);
     printf("file : %s\n\n", file);
 
     fs_error(fs_mount(path));
